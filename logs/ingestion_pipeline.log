@@ -1,0 +1,641 @@
+2026-01-19 11:35:12,693 - INFO - Executing SQL query
+2026-01-19 11:35:12,694 - INFO - 
+            CREATE TABLE IF NOT EXISTS flights (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                year INTEGER,
+                month INTEGER,
+                day INTEGER,
+                flight_date TEXT,
+                airline TEXT,
+                flight_number INTEGER,
+                origin TEXT,
+                dest TEXT,
+                distance REAL,
+                dep_delay REAL,
+                arr_delay REAL,
+                arr_del15 INTEGER,
+                cancelled INTEGER,
+                diverted INTEGER
+            );
+            
+2026-01-19 11:35:12,702 - INFO - Executing SQL query
+2026-01-19 11:35:12,702 - INFO - 
+            CREATE TABLE IF NOT EXISTS ingested_files (
+            file_name TEXT PRIMARY KEY,
+            year INTEGER,
+            month INTEGER,
+            ingested_at TEXT,
+            n_rows INTEGER,
+            status TEXT   -- 'success' | 'failed'
+            );
+            
+2026-01-19 11:35:12,748 - INFO - Processing csv file: ../data/raw/2024_01_Report.csv
+2026-01-19 11:35:16,644 - INFO - Processing csv file: ../data/raw/2024_02_Report.csv
+2026-01-19 11:35:20,326 - INFO - Processing csv file: ../data/raw/2024_03_Report.csv
+2026-01-19 11:35:24,604 - INFO - Processing csv file: ../data/raw/2024_04_Report.csv
+2026-01-19 11:35:28,595 - INFO - Processing csv file: ../data/raw/2024_05_Report.csv
+2026-01-19 11:35:32,749 - INFO - Processing csv file: ../data/raw/2024_06_Report.csv
+2026-01-19 11:35:36,800 - INFO - Processing csv file: ../data/raw/2024_07_Report.csv
+2026-01-19 11:35:41,078 - INFO - Processing csv file: ../data/raw/2024_08_Report.csv
+2026-01-19 11:35:45,287 - INFO - Processing csv file: ../data/raw/2024_09_Report.csv
+2026-01-19 11:35:49,245 - INFO - Processing csv file: ../data/raw/2024_10_Report.csv
+2026-01-19 11:35:53,432 - INFO - Processing csv file: ../data/raw/2024_11_Report.csv
+2026-01-19 11:35:57,427 - INFO - Processing csv file: ../data/raw/2024_12_Report.csv
+2026-01-19 11:36:01,449 - INFO - Processing csv file: ../data/raw/2025_01_Report.csv
+2026-01-19 11:36:05,146 - INFO - Processing csv file: ../data/raw/2025_02_Report.csv
+2026-01-19 11:36:08,532 - INFO - Processing csv file: ../data/raw/2025_03_Report.csv
+2026-01-19 11:36:12,614 - INFO - Processing csv file: ../data/raw/2025_04_Report.csv
+2026-01-19 11:36:16,600 - INFO - Processing csv file: ../data/raw/2025_05_Report.csv
+2026-01-19 11:36:20,686 - INFO - Processing csv file: ../data/raw/2025_06_Report.csv
+2026-01-19 11:36:24,855 - INFO - Processing csv file: ../data/raw/2025_07_Report.csv
+2026-01-19 11:36:29,146 - INFO - Processing csv file: ../data/raw/2025_08_Report.csv
+2026-01-19 11:36:33,237 - INFO - Processing csv file: ../data/raw/2025_09_Report.csv
+2026-01-19 11:36:37,089 - INFO - Processing csv file: ../data/raw/2025_10_Report.csv
+2026-01-19 11:36:41,301 - INFO - Processing csv file: ../data/raw/2025_11_Report.csv
+2026-01-19 11:36:41,302 - WARNING - File not found: ../data/raw/2025_11_Report.csv, skipping.
+2026-01-19 11:36:41,304 - INFO - Processing csv file: ../data/raw/2025_12_Report.csv
+2026-01-19 11:36:41,304 - WARNING - File not found: ../data/raw/2025_12_Report.csv, skipping.
+2026-01-19 11:36:41,305 - INFO - Executing SQL query
+2026-01-19 11:36:41,305 - INFO - PRAGMA table_info(flights);
+2026-01-19 11:36:41,308 - INFO - Executing SQL query
+2026-01-19 11:36:41,308 - INFO - ALTER TABLE flights ADD COLUMN route;
+2026-01-19 11:36:41,311 - INFO - Executing SQL query
+2026-01-19 11:36:41,311 - INFO - 
+                      UPDATE flights
+                      SET route = origin || '-' || dest
+                      WHERE route IS NULL;
+                      
+2026-01-19 11:36:56,832 - INFO - Executing SQL query
+2026-01-19 11:36:56,832 - INFO - CREATE INDEX IF NOT EXISTS idx_flight_date ON flights(flight_date);
+2026-01-19 11:37:08,544 - INFO - Executing SQL query
+2026-01-19 11:37:08,546 - INFO - CREATE INDEX IF NOT EXISTS idx_origin_dest ON flights(origin, dest);
+2026-01-19 11:37:25,586 - INFO - Executing SQL query
+2026-01-19 11:37:25,587 - INFO - CREATE INDEX IF NOT EXISTS idx_airline ON flights(airline);
+2026-01-19 11:37:31,341 - INFO - Executing SQL query
+2026-01-19 11:37:31,342 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_flights_base AS
+        SELECT
+            flight_date,
+            airline,
+            flight_number,
+            origin,
+            dest,
+            distance,
+            dep_delay,
+            arr_delay,
+            arr_del15,
+            cancelled,
+            diverted,
+            route
+        FROM flights
+        WHERE cancelled = 0;
+        
+2026-01-19 11:38:27,578 - INFO - Executing SQL query
+2026-01-19 11:38:27,579 - INFO - 
+            CREATE TABLE IF NOT EXISTS flights (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                year INTEGER,
+                month INTEGER,
+                day INTEGER,
+                flight_date TEXT,
+                airline TEXT,
+                flight_number INTEGER,
+                origin TEXT,
+                dest TEXT,
+                distance REAL,
+                dep_delay REAL,
+                arr_delay REAL,
+                arr_del15 INTEGER,
+                cancelled INTEGER,
+                diverted INTEGER
+            );
+            
+2026-01-19 11:38:27,580 - INFO - Executing SQL query
+2026-01-19 11:38:27,580 - INFO - 
+            CREATE TABLE IF NOT EXISTS ingested_files (
+            file_name TEXT PRIMARY KEY,
+            year INTEGER,
+            month INTEGER,
+            ingested_at TEXT,
+            n_rows INTEGER,
+            status TEXT   -- 'success' | 'failed'
+            );
+            
+2026-01-19 11:38:27,620 - INFO - Skipping already ingested file: ../data/raw/2024_01_Report.csv
+2026-01-19 11:38:27,621 - INFO - Skipping already ingested file: ../data/raw/2024_02_Report.csv
+2026-01-19 11:38:27,622 - INFO - Skipping already ingested file: ../data/raw/2024_03_Report.csv
+2026-01-19 11:38:27,622 - INFO - Skipping already ingested file: ../data/raw/2024_04_Report.csv
+2026-01-19 11:38:27,623 - INFO - Skipping already ingested file: ../data/raw/2024_05_Report.csv
+2026-01-19 11:38:27,624 - INFO - Skipping already ingested file: ../data/raw/2024_06_Report.csv
+2026-01-19 11:38:27,624 - INFO - Skipping already ingested file: ../data/raw/2024_07_Report.csv
+2026-01-19 11:38:27,625 - INFO - Skipping already ingested file: ../data/raw/2024_08_Report.csv
+2026-01-19 11:38:27,626 - INFO - Skipping already ingested file: ../data/raw/2024_09_Report.csv
+2026-01-19 11:38:27,627 - INFO - Skipping already ingested file: ../data/raw/2024_10_Report.csv
+2026-01-19 11:38:27,628 - INFO - Skipping already ingested file: ../data/raw/2024_11_Report.csv
+2026-01-19 11:38:27,629 - INFO - Skipping already ingested file: ../data/raw/2024_12_Report.csv
+2026-01-19 11:38:27,630 - INFO - Skipping already ingested file: ../data/raw/2025_01_Report.csv
+2026-01-19 11:38:27,631 - INFO - Skipping already ingested file: ../data/raw/2025_02_Report.csv
+2026-01-19 11:38:27,632 - INFO - Skipping already ingested file: ../data/raw/2025_03_Report.csv
+2026-01-19 11:38:27,633 - INFO - Skipping already ingested file: ../data/raw/2025_04_Report.csv
+2026-01-19 11:38:27,634 - INFO - Skipping already ingested file: ../data/raw/2025_05_Report.csv
+2026-01-19 11:38:27,634 - INFO - Skipping already ingested file: ../data/raw/2025_06_Report.csv
+2026-01-19 11:38:27,635 - INFO - Skipping already ingested file: ../data/raw/2025_07_Report.csv
+2026-01-19 11:38:27,636 - INFO - Skipping already ingested file: ../data/raw/2025_08_Report.csv
+2026-01-19 11:38:27,636 - INFO - Skipping already ingested file: ../data/raw/2025_09_Report.csv
+2026-01-19 11:38:27,637 - INFO - Skipping already ingested file: ../data/raw/2025_10_Report.csv
+2026-01-19 11:38:27,638 - INFO - Processing csv file: ../data/raw/2025_11_Report.csv
+2026-01-19 11:38:27,647 - WARNING - File not found: ../data/raw/2025_11_Report.csv, skipping.
+2026-01-19 11:38:27,648 - INFO - Processing csv file: ../data/raw/2025_12_Report.csv
+2026-01-19 11:38:27,649 - WARNING - File not found: ../data/raw/2025_12_Report.csv, skipping.
+2026-01-19 11:38:27,649 - INFO - Executing SQL query
+2026-01-19 11:38:27,649 - INFO - PRAGMA table_info(flights);
+2026-01-19 11:38:27,652 - INFO - Executing SQL query
+2026-01-19 11:38:27,652 - INFO - ALTER TABLE flights ADD COLUMN route;
+2026-01-19 11:41:38,949 - INFO - Executing SQL query
+2026-01-19 11:41:38,950 - INFO - 
+            CREATE TABLE IF NOT EXISTS flights (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                year INTEGER,
+                month INTEGER,
+                day INTEGER,
+                flight_date TEXT,
+                airline TEXT,
+                flight_number INTEGER,
+                origin TEXT,
+                dest TEXT,
+                distance REAL,
+                dep_delay REAL,
+                arr_delay REAL,
+                arr_del15 INTEGER,
+                cancelled INTEGER,
+                diverted INTEGER
+            );
+            
+2026-01-19 11:41:38,956 - INFO - Executing SQL query
+2026-01-19 11:41:38,957 - INFO - 
+            CREATE TABLE IF NOT EXISTS ingested_files (
+            file_name TEXT PRIMARY KEY,
+            year INTEGER,
+            month INTEGER,
+            ingested_at TEXT,
+            n_rows INTEGER,
+            status TEXT   -- 'success' | 'failed'
+            );
+            
+2026-01-19 11:41:38,997 - INFO - Skipping already ingested file: ../data/raw/2024_01_Report.csv
+2026-01-19 11:41:38,999 - INFO - Skipping already ingested file: ../data/raw/2024_02_Report.csv
+2026-01-19 11:41:38,999 - INFO - Skipping already ingested file: ../data/raw/2024_03_Report.csv
+2026-01-19 11:41:39,000 - INFO - Skipping already ingested file: ../data/raw/2024_04_Report.csv
+2026-01-19 11:41:39,001 - INFO - Skipping already ingested file: ../data/raw/2024_05_Report.csv
+2026-01-19 11:41:39,002 - INFO - Skipping already ingested file: ../data/raw/2024_06_Report.csv
+2026-01-19 11:41:39,004 - INFO - Skipping already ingested file: ../data/raw/2024_07_Report.csv
+2026-01-19 11:41:39,005 - INFO - Skipping already ingested file: ../data/raw/2024_08_Report.csv
+2026-01-19 11:41:39,006 - INFO - Skipping already ingested file: ../data/raw/2024_09_Report.csv
+2026-01-19 11:41:39,008 - INFO - Skipping already ingested file: ../data/raw/2024_10_Report.csv
+2026-01-19 11:41:39,009 - INFO - Skipping already ingested file: ../data/raw/2024_11_Report.csv
+2026-01-19 11:41:39,009 - INFO - Skipping already ingested file: ../data/raw/2024_12_Report.csv
+2026-01-19 11:41:39,010 - INFO - Skipping already ingested file: ../data/raw/2025_01_Report.csv
+2026-01-19 11:41:39,011 - INFO - Skipping already ingested file: ../data/raw/2025_02_Report.csv
+2026-01-19 11:41:39,011 - INFO - Skipping already ingested file: ../data/raw/2025_03_Report.csv
+2026-01-19 11:41:39,012 - INFO - Skipping already ingested file: ../data/raw/2025_04_Report.csv
+2026-01-19 11:41:39,013 - INFO - Skipping already ingested file: ../data/raw/2025_05_Report.csv
+2026-01-19 11:41:39,013 - INFO - Skipping already ingested file: ../data/raw/2025_06_Report.csv
+2026-01-19 11:41:39,014 - INFO - Skipping already ingested file: ../data/raw/2025_07_Report.csv
+2026-01-19 11:41:39,015 - INFO - Skipping already ingested file: ../data/raw/2025_08_Report.csv
+2026-01-19 11:41:39,016 - INFO - Skipping already ingested file: ../data/raw/2025_09_Report.csv
+2026-01-19 11:41:39,017 - INFO - Skipping already ingested file: ../data/raw/2025_10_Report.csv
+2026-01-19 11:41:39,018 - INFO - Processing csv file: ../data/raw/2025_11_Report.csv
+2026-01-19 11:41:39,028 - WARNING - File not found: ../data/raw/2025_11_Report.csv, skipping.
+2026-01-19 11:41:39,029 - INFO - Processing csv file: ../data/raw/2025_12_Report.csv
+2026-01-19 11:41:39,029 - WARNING - File not found: ../data/raw/2025_12_Report.csv, skipping.
+2026-01-19 11:41:39,030 - INFO - Executing SQL query
+2026-01-19 11:41:39,030 - INFO - PRAGMA table_info(flights);
+2026-01-19 11:41:39,038 - INFO - Executing SQL query
+2026-01-19 11:41:39,038 - INFO - ALTER TABLE flights ADD COLUMN route TEXT;
+2026-01-19 11:42:29,411 - INFO - Executing SQL query
+2026-01-19 11:42:29,412 - INFO - 
+            CREATE TABLE IF NOT EXISTS flights (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                year INTEGER,
+                month INTEGER,
+                day INTEGER,
+                flight_date TEXT,
+                airline TEXT,
+                flight_number INTEGER,
+                origin TEXT,
+                dest TEXT,
+                distance REAL,
+                dep_delay REAL,
+                arr_delay REAL,
+                arr_del15 INTEGER,
+                cancelled INTEGER,
+                diverted INTEGER
+            );
+            
+2026-01-19 11:42:29,413 - INFO - Executing SQL query
+2026-01-19 11:42:29,413 - INFO - 
+            CREATE TABLE IF NOT EXISTS ingested_files (
+            file_name TEXT PRIMARY KEY,
+            year INTEGER,
+            month INTEGER,
+            ingested_at TEXT,
+            n_rows INTEGER,
+            status TEXT   -- 'success' | 'failed'
+            );
+            
+2026-01-19 11:42:29,446 - INFO - Skipping already ingested file: ../data/raw/2024_01_Report.csv
+2026-01-19 11:42:29,447 - INFO - Skipping already ingested file: ../data/raw/2024_02_Report.csv
+2026-01-19 11:42:29,448 - INFO - Skipping already ingested file: ../data/raw/2024_03_Report.csv
+2026-01-19 11:42:29,448 - INFO - Skipping already ingested file: ../data/raw/2024_04_Report.csv
+2026-01-19 11:42:29,449 - INFO - Skipping already ingested file: ../data/raw/2024_05_Report.csv
+2026-01-19 11:42:29,450 - INFO - Skipping already ingested file: ../data/raw/2024_06_Report.csv
+2026-01-19 11:42:29,450 - INFO - Skipping already ingested file: ../data/raw/2024_07_Report.csv
+2026-01-19 11:42:29,451 - INFO - Skipping already ingested file: ../data/raw/2024_08_Report.csv
+2026-01-19 11:42:29,452 - INFO - Skipping already ingested file: ../data/raw/2024_09_Report.csv
+2026-01-19 11:42:29,453 - INFO - Skipping already ingested file: ../data/raw/2024_10_Report.csv
+2026-01-19 11:42:29,454 - INFO - Skipping already ingested file: ../data/raw/2024_11_Report.csv
+2026-01-19 11:42:29,455 - INFO - Skipping already ingested file: ../data/raw/2024_12_Report.csv
+2026-01-19 11:42:29,456 - INFO - Skipping already ingested file: ../data/raw/2025_01_Report.csv
+2026-01-19 11:42:29,457 - INFO - Skipping already ingested file: ../data/raw/2025_02_Report.csv
+2026-01-19 11:42:29,458 - INFO - Skipping already ingested file: ../data/raw/2025_03_Report.csv
+2026-01-19 11:42:29,459 - INFO - Skipping already ingested file: ../data/raw/2025_04_Report.csv
+2026-01-19 11:42:29,459 - INFO - Skipping already ingested file: ../data/raw/2025_05_Report.csv
+2026-01-19 11:42:29,460 - INFO - Skipping already ingested file: ../data/raw/2025_06_Report.csv
+2026-01-19 11:42:29,461 - INFO - Skipping already ingested file: ../data/raw/2025_07_Report.csv
+2026-01-19 11:42:29,462 - INFO - Skipping already ingested file: ../data/raw/2025_08_Report.csv
+2026-01-19 11:42:29,463 - INFO - Skipping already ingested file: ../data/raw/2025_09_Report.csv
+2026-01-19 11:42:29,464 - INFO - Skipping already ingested file: ../data/raw/2025_10_Report.csv
+2026-01-19 11:42:29,464 - INFO - Processing csv file: ../data/raw/2025_11_Report.csv
+2026-01-19 11:42:29,474 - WARNING - File not found: ../data/raw/2025_11_Report.csv, skipping.
+2026-01-19 11:42:29,475 - INFO - Processing csv file: ../data/raw/2025_12_Report.csv
+2026-01-19 11:42:29,476 - WARNING - File not found: ../data/raw/2025_12_Report.csv, skipping.
+2026-01-19 11:42:29,476 - INFO - Executing SQL query
+2026-01-19 11:42:29,476 - INFO - PRAGMA table_info(flights);
+2026-01-19 11:42:29,481 - INFO - Executing SQL query
+2026-01-19 11:42:29,481 - INFO - 
+                      UPDATE flights
+                      SET route = origin || '-' || dest
+                      WHERE route IS NULL;
+                      
+2026-01-19 11:42:33,190 - INFO - Executing SQL query
+2026-01-19 11:42:33,190 - INFO - CREATE INDEX IF NOT EXISTS idx_flight_date ON flights(flight_date);
+2026-01-19 11:42:33,191 - INFO - Executing SQL query
+2026-01-19 11:42:33,191 - INFO - CREATE INDEX IF NOT EXISTS idx_origin_dest ON flights(origin, dest);
+2026-01-19 11:42:33,192 - INFO - Executing SQL query
+2026-01-19 11:42:33,192 - INFO - CREATE INDEX IF NOT EXISTS idx_airline ON flights(airline);
+2026-01-19 11:42:33,192 - INFO - Executing SQL query
+2026-01-19 11:42:33,192 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_flights_base AS
+        SELECT
+            flight_date,
+            airline,
+            flight_number,
+            origin,
+            dest,
+            distance,
+            dep_delay,
+            arr_delay,
+            arr_del15,
+            cancelled,
+            diverted,
+            route
+        FROM flights
+        WHERE cancelled = 0;
+        
+2026-01-19 11:42:33,193 - INFO - Created view: v_flights_base
+2026-01-19 11:42:33,193 - INFO - Executing SQL query
+2026-01-19 11:42:33,193 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_airline_delay_stats AS
+        SELECT
+            airline,
+            COUNT(*) AS n_flights,
+            AVG(arr_delay) AS avg_arr_delay,
+            AVG(dep_delay) AS avg_dep_delay,
+            SUM(arr_del15) * 1.0 / COUNT(*) AS pct_arr_del15
+        FROM flights
+        WHERE cancelled = 0
+        GROUP BY airline;
+        
+2026-01-19 11:42:33,200 - INFO - Created view: v_airline_delay_stats
+2026-01-19 11:42:33,200 - INFO - Executing SQL query
+2026-01-19 11:42:33,200 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_monthly_delays AS
+        SELECT
+            year,
+            month,
+            AVG(arr_delay) AS avg_arr_delay,
+            COUNT(*) AS n_flights
+        FROM flights
+        WHERE cancelled = 0
+        GROUP BY year, month;
+        
+2026-01-19 11:42:33,202 - INFO - Created view: v_monthly_delays
+2026-01-19 11:42:33,202 - INFO - Executing SQL query
+2026-01-19 11:42:33,202 - INFO - CREATE VIEW IF NOT EXISTS v_airline_rolling_metrics AS
+                SELECT
+                    year,
+                    month,
+                    airline,
+                    AVG(arr_delay) AS avg_arr_delay,
+
+                    -- rolling 3-month average delay
+                    AVG(AVG(arr_delay)) OVER (
+                        PARTITION BY airline
+                        ORDER BY year, month
+                        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+                    ) AS rolling_3mo_avg_delay,
+
+                    -- rolling flight count
+                    SUM(COUNT(*)) OVER (
+                        PARTITION BY airline
+                        ORDER BY year, month
+                        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+                    ) AS rolling_3mo_flights
+
+                FROM flights
+                WHERE cancelled = 0
+                GROUP BY year, month, airline;
+                
+2026-01-19 11:42:33,204 - INFO - Created view: v_airline_rolling_metrics
+2026-01-19 11:42:33,204 - INFO - Executing SQL query
+2026-01-19 11:42:33,204 - INFO - 
+                CREATE VIEW IF NOT EXISTS v_airline_vs_month_avg AS
+                SELECT
+                    year,
+                    month,
+                    airline,
+                    AVG(arr_delay) AS airline_avg_delay,
+                    AVG(AVG(arr_delay)) OVER (
+                        PARTITION BY year, month
+                    ) AS month_avg_delay,
+                    AVG(arr_delay)
+                    - AVG(AVG(arr_delay)) OVER (PARTITION BY year, month)
+                    AS delay_vs_month_avg
+                FROM flights
+                WHERE cancelled = 0
+                GROUP BY year, month, airline;
+                
+2026-01-19 11:42:33,206 - INFO - Created view: v_airline_vs_month_avg
+2026-01-19 11:42:33,206 - INFO - Executing SQL query
+2026-01-19 11:42:33,206 - INFO - 
+                SELECT * 
+                FROM flights
+                LIMIT 10;
+            
+2026-01-19 11:42:33,209 - INFO -  
+2026-01-19 11:42:33,242 - INFO -    id  year  month  day           flight_date airline  ...  dep_delay arr_delay arr_del15  cancelled  diverted    route
+0   1  2024      1    1  1/1/2024 12:00:00 AM      9E  ...       -4.0     -17.0         0          0         0  ATL-AVL
+1   2  2024      1    1  1/1/2024 12:00:00 AM      9E  ...       -4.0     -33.0         0          0         0  DTW-OMA
+2   3  2024      1    1  1/1/2024 12:00:00 AM      9E  ...       -5.0      -8.0         0          0         0  DSM-DTW
+3   4  2024      1    1  1/1/2024 12:00:00 AM      9E  ...       -5.0     -26.0         0          0         0  LGA-SAV
+4   5  2024      1    1  1/1/2024 12:00:00 AM      9E  ...       -7.0     -21.0         0          0         0  CHS-LGA
+5   6  2024      1    1  1/1/2024 12:00:00 AM      9E  ...       -6.0     -20.0         0          0         0  AVL-LGA
+6   7  2024      1    1  1/1/2024 12:00:00 AM      9E  ...      -10.0     -34.0         0          0         0  LGA-AVL
+7   8  2024      1    1  1/1/2024 12:00:00 AM      9E  ...        4.0      -1.0         0          0         0  SYR-DTW
+8   9  2024      1    1  1/1/2024 12:00:00 AM      9E  ...       -5.0     -29.0         0          0         0  LGA-PVD
+9  10  2024      1    1  1/1/2024 12:00:00 AM      9E  ...       -3.0     -33.0         0          0         0  DTW-MCI
+
+[10 rows x 16 columns]
+2026-01-19 11:42:33,243 - INFO -  
+2026-01-19 11:42:33,243 - INFO - Executing SQL query
+2026-01-19 11:42:33,243 - INFO - 
+                SELECT * 
+                FROM ingested_files
+                LIMIT 10;
+            
+2026-01-19 11:42:33,244 - INFO -  
+2026-01-19 11:42:33,249 - INFO -                         file_name  year  month                ingested_at  n_rows   status
+0  ../data/raw/2024_01_Report.csv  2024      1  2026-01-19T17:35:16+00:00  547271  success
+1  ../data/raw/2024_02_Report.csv  2024      2  2026-01-19T17:35:20+00:00  519221  success
+2  ../data/raw/2024_03_Report.csv  2024      3  2026-01-19T17:35:24+00:00  591767  success
+3  ../data/raw/2024_04_Report.csv  2024      4  2026-01-19T17:35:28+00:00  582205  success
+4  ../data/raw/2024_05_Report.csv  2024      5  2026-01-19T17:35:32+00:00  609743  success
+5  ../data/raw/2024_06_Report.csv  2024      6  2026-01-19T17:35:36+00:00  611132  success
+6  ../data/raw/2024_07_Report.csv  2024      7  2026-01-19T17:35:41+00:00  634613  success
+7  ../data/raw/2024_08_Report.csv  2024      8  2026-01-19T17:35:45+00:00  619025  success
+8  ../data/raw/2024_09_Report.csv  2024      9  2026-01-19T17:35:49+00:00  582622  success
+9  ../data/raw/2024_10_Report.csv  2024     10  2026-01-19T17:35:53+00:00  615497  success
+2026-01-19 11:42:33,249 - INFO -  
+2026-01-19 11:42:33,249 - INFO - Executing SQL query
+2026-01-19 11:42:33,249 - INFO - SELECT * FROM v_airline_rolling_metrics;
+2026-01-19 11:42:45,939 - INFO - Executing SQL query
+2026-01-19 11:42:45,939 - INFO - SELECT * FROM v_airline_delay_stats;
+2026-01-19 11:42:51,316 - INFO - Executing SQL query
+2026-01-19 11:42:51,316 - INFO - SELECT * FROM v_monthly_delays;
+2026-01-19 11:42:58,577 - INFO - Executing SQL query
+2026-01-19 11:42:58,578 - INFO - SELECT * FROM v_airline_rolling_metrics;
+2026-01-19 11:43:09,712 - INFO - Executing SQL query
+2026-01-19 11:43:09,714 - INFO - SELECT * FROM v_airline_vs_month_avg;
+2026-01-19 11:49:37,874 - INFO - Executing SQL query
+2026-01-19 11:49:37,875 - INFO - 
+            CREATE TABLE IF NOT EXISTS flights (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                year INTEGER,
+                month INTEGER,
+                day INTEGER,
+                flight_date TEXT,
+                airline TEXT,
+                flight_number INTEGER,
+                origin TEXT,
+                dest TEXT,
+                distance REAL,
+                dep_delay REAL,
+                arr_delay REAL,
+                arr_del15 INTEGER,
+                cancelled INTEGER,
+                diverted INTEGER
+            );
+            
+2026-01-19 11:49:37,882 - INFO - Executing SQL query
+2026-01-19 11:49:37,882 - INFO - 
+            CREATE TABLE IF NOT EXISTS ingested_files (
+            file_name TEXT PRIMARY KEY,
+            year INTEGER,
+            month INTEGER,
+            ingested_at TEXT,
+            n_rows INTEGER,
+            status TEXT   -- 'success' | 'failed'
+            );
+            
+2026-01-19 11:49:37,883 - INFO - Reset flag is True: clearing flights and ingestion log tables
+2026-01-19 11:50:01,029 - INFO - Processing csv file: ../data/raw/2024_01_Report.csv
+2026-01-19 11:50:07,741 - INFO - Processing csv file: ../data/raw/2024_02_Report.csv
+2026-01-19 11:50:17,748 - INFO - Processing csv file: ../data/raw/2024_03_Report.csv
+2026-01-19 11:50:29,722 - INFO - Processing csv file: ../data/raw/2024_04_Report.csv
+2026-01-19 11:50:40,508 - INFO - Processing csv file: ../data/raw/2024_05_Report.csv
+2026-01-19 11:50:52,392 - INFO - Processing csv file: ../data/raw/2024_06_Report.csv
+2026-01-19 11:51:05,496 - INFO - Processing csv file: ../data/raw/2024_07_Report.csv
+2026-01-19 11:51:18,094 - INFO - Processing csv file: ../data/raw/2024_08_Report.csv
+2026-01-19 11:51:31,915 - INFO - Processing csv file: ../data/raw/2024_09_Report.csv
+2026-01-19 11:51:45,062 - INFO - Processing csv file: ../data/raw/2024_10_Report.csv
+2026-01-19 11:51:58,389 - INFO - Processing csv file: ../data/raw/2024_11_Report.csv
+2026-01-19 11:52:10,901 - INFO - Processing csv file: ../data/raw/2024_12_Report.csv
+2026-01-19 11:52:24,525 - INFO - Processing csv file: ../data/raw/2025_01_Report.csv
+2026-01-19 11:52:36,622 - INFO - Processing csv file: ../data/raw/2025_02_Report.csv
+2026-01-19 11:52:48,139 - INFO - Processing csv file: ../data/raw/2025_03_Report.csv
+2026-01-19 11:53:02,200 - INFO - Processing csv file: ../data/raw/2025_04_Report.csv
+2026-01-19 11:53:15,416 - INFO - Processing csv file: ../data/raw/2025_05_Report.csv
+2026-01-19 11:53:28,466 - INFO - Processing csv file: ../data/raw/2025_06_Report.csv
+2026-01-19 11:53:41,807 - INFO - Processing csv file: ../data/raw/2025_07_Report.csv
+2026-01-19 11:53:55,946 - INFO - Processing csv file: ../data/raw/2025_08_Report.csv
+2026-01-19 11:54:07,960 - INFO - Processing csv file: ../data/raw/2025_09_Report.csv
+2026-01-19 11:54:19,439 - INFO - Processing csv file: ../data/raw/2025_10_Report.csv
+2026-01-19 11:54:33,560 - INFO - Processing csv file: ../data/raw/2025_11_Report.csv
+2026-01-19 11:54:33,561 - WARNING - File not found: ../data/raw/2025_11_Report.csv, skipping.
+2026-01-19 11:54:33,562 - INFO - Processing csv file: ../data/raw/2025_12_Report.csv
+2026-01-19 11:54:33,562 - WARNING - File not found: ../data/raw/2025_12_Report.csv, skipping.
+2026-01-19 11:54:33,565 - INFO - Executing SQL query
+2026-01-19 11:54:33,566 - INFO - PRAGMA table_info(flights);
+2026-01-19 11:54:33,579 - INFO - Executing SQL query
+2026-01-19 11:54:33,579 - INFO - 
+                      UPDATE flights
+                      SET route = origin || '-' || dest
+                      WHERE route IS NULL;
+                      
+2026-01-19 11:54:52,471 - INFO - Executing SQL query
+2026-01-19 11:54:52,471 - INFO - CREATE INDEX IF NOT EXISTS idx_flight_date ON flights(flight_date);
+2026-01-19 11:54:52,477 - INFO - Executing SQL query
+2026-01-19 11:54:52,477 - INFO - CREATE INDEX IF NOT EXISTS idx_origin_dest ON flights(origin, dest);
+2026-01-19 11:54:52,479 - INFO - Executing SQL query
+2026-01-19 11:54:52,479 - INFO - CREATE INDEX IF NOT EXISTS idx_airline ON flights(airline);
+2026-01-19 11:54:52,480 - INFO - Executing SQL query
+2026-01-19 11:54:52,480 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_flights_base AS
+        SELECT
+            flight_date,
+            airline,
+            flight_number,
+            origin,
+            dest,
+            distance,
+            dep_delay,
+            arr_delay,
+            arr_del15,
+            cancelled,
+            diverted,
+            route
+        FROM flights
+        WHERE cancelled = 0;
+        
+2026-01-19 11:54:52,480 - INFO - Created view: v_flights_base
+2026-01-19 11:54:52,481 - INFO - Executing SQL query
+2026-01-19 11:54:52,481 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_airline_delay_stats AS
+        SELECT
+            airline,
+            COUNT(*) AS n_flights,
+            AVG(arr_delay) AS avg_arr_delay,
+            AVG(dep_delay) AS avg_dep_delay,
+            SUM(arr_del15) * 1.0 / COUNT(*) AS pct_arr_del15
+        FROM flights
+        WHERE cancelled = 0
+        GROUP BY airline;
+        
+2026-01-19 11:54:52,481 - INFO - Created view: v_airline_delay_stats
+2026-01-19 11:54:52,481 - INFO - Executing SQL query
+2026-01-19 11:54:52,481 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_monthly_delays AS
+        SELECT
+            year,
+            month,
+            AVG(arr_delay) AS avg_arr_delay,
+            COUNT(*) AS n_flights
+        FROM flights
+        WHERE cancelled = 0
+        GROUP BY year, month;
+        
+2026-01-19 11:54:52,482 - INFO - Created view: v_monthly_delays
+2026-01-19 11:54:52,482 - INFO - Executing SQL query
+2026-01-19 11:54:52,482 - INFO - CREATE VIEW IF NOT EXISTS v_airline_rolling_metrics AS
+                SELECT
+                    year,
+                    month,
+                    airline,
+                    AVG(arr_delay) AS avg_arr_delay,
+
+                    -- rolling 3-month average delay
+                    AVG(AVG(arr_delay)) OVER (
+                        PARTITION BY airline
+                        ORDER BY year, month
+                        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+                    ) AS rolling_3mo_avg_delay,
+
+                    -- rolling flight count
+                    SUM(COUNT(*)) OVER (
+                        PARTITION BY airline
+                        ORDER BY year, month
+                        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+                    ) AS rolling_3mo_flights
+
+                FROM flights
+                WHERE cancelled = 0
+                GROUP BY year, month, airline;
+                
+2026-01-19 11:54:52,483 - INFO - Created view: v_airline_rolling_metrics
+2026-01-19 11:54:52,483 - INFO - Executing SQL query
+2026-01-19 11:54:52,483 - INFO - 
+                CREATE VIEW IF NOT EXISTS v_airline_vs_month_avg AS
+                SELECT
+                    year,
+                    month,
+                    airline,
+                    AVG(arr_delay) AS airline_avg_delay,
+                    AVG(AVG(arr_delay)) OVER (
+                        PARTITION BY year, month
+                    ) AS month_avg_delay,
+                    AVG(arr_delay)
+                    - AVG(AVG(arr_delay)) OVER (PARTITION BY year, month)
+                    AS delay_vs_month_avg
+                FROM flights
+                WHERE cancelled = 0
+                GROUP BY year, month, airline;
+                
+2026-01-19 11:54:52,484 - INFO - Created view: v_airline_vs_month_avg
+2026-01-19 11:54:52,484 - INFO - Executing SQL query
+2026-01-19 11:54:52,484 - INFO - 
+                SELECT * 
+                FROM flights
+                LIMIT 10;
+            
+2026-01-19 11:54:52,486 - INFO -  
+2026-01-19 11:54:52,539 - INFO -          id  year  month  day           flight_date airline  ...  dep_delay arr_delay arr_del15  cancelled  diverted    route
+0  12927847  2024      1    1  1/1/2024 12:00:00 AM      9E  ...       -4.0     -17.0         0          0         0  ATL-AVL
+1  12927848  2024      1    1  1/1/2024 12:00:00 AM      9E  ...       -4.0     -33.0         0          0         0  DTW-OMA
+2  12927849  2024      1    1  1/1/2024 12:00:00 AM      9E  ...       -5.0      -8.0         0          0         0  DSM-DTW
+3  12927850  2024      1    1  1/1/2024 12:00:00 AM      9E  ...       -5.0     -26.0         0          0         0  LGA-SAV
+4  12927851  2024      1    1  1/1/2024 12:00:00 AM      9E  ...       -7.0     -21.0         0          0         0  CHS-LGA
+5  12927852  2024      1    1  1/1/2024 12:00:00 AM      9E  ...       -6.0     -20.0         0          0         0  AVL-LGA
+6  12927853  2024      1    1  1/1/2024 12:00:00 AM      9E  ...      -10.0     -34.0         0          0         0  LGA-AVL
+7  12927854  2024      1    1  1/1/2024 12:00:00 AM      9E  ...        4.0      -1.0         0          0         0  SYR-DTW
+8  12927855  2024      1    1  1/1/2024 12:00:00 AM      9E  ...       -5.0     -29.0         0          0         0  LGA-PVD
+9  12927856  2024      1    1  1/1/2024 12:00:00 AM      9E  ...       -3.0     -33.0         0          0         0  DTW-MCI
+
+[10 rows x 16 columns]
+2026-01-19 11:54:52,539 - INFO -  
+2026-01-19 11:54:52,539 - INFO - Executing SQL query
+2026-01-19 11:54:52,539 - INFO - 
+                SELECT * 
+                FROM ingested_files
+                LIMIT 10;
+            
+2026-01-19 11:54:52,542 - INFO -  
+2026-01-19 11:54:52,551 - INFO -                         file_name  year  month                ingested_at  n_rows   status
+0  ../data/raw/2024_01_Report.csv  2024      1  2026-01-19T17:50:07+00:00  547271  success
+1  ../data/raw/2024_02_Report.csv  2024      2  2026-01-19T17:50:17+00:00  519221  success
+2  ../data/raw/2024_03_Report.csv  2024      3  2026-01-19T17:50:29+00:00  591767  success
+3  ../data/raw/2024_04_Report.csv  2024      4  2026-01-19T17:50:40+00:00  582205  success
+4  ../data/raw/2024_05_Report.csv  2024      5  2026-01-19T17:50:52+00:00  609743  success
+5  ../data/raw/2024_06_Report.csv  2024      6  2026-01-19T17:51:05+00:00  611132  success
+6  ../data/raw/2024_07_Report.csv  2024      7  2026-01-19T17:51:18+00:00  634613  success
+7  ../data/raw/2024_08_Report.csv  2024      8  2026-01-19T17:51:31+00:00  619025  success
+8  ../data/raw/2024_09_Report.csv  2024      9  2026-01-19T17:51:45+00:00  582622  success
+9  ../data/raw/2024_10_Report.csv  2024     10  2026-01-19T17:51:58+00:00  615497  success
+2026-01-19 11:54:52,551 - INFO -  
+2026-01-19 11:54:52,551 - INFO - Executing SQL query
+2026-01-19 11:54:52,551 - INFO - SELECT * FROM v_airline_rolling_metrics;
+2026-01-19 11:55:04,533 - INFO - Executing SQL query
+2026-01-19 11:55:04,534 - INFO - SELECT * FROM v_airline_delay_stats;
+2026-01-19 11:55:07,649 - INFO - Executing SQL query
+2026-01-19 11:55:07,649 - INFO - SELECT * FROM v_monthly_delays;
+2026-01-19 11:55:15,937 - INFO - Executing SQL query
+2026-01-19 11:55:15,937 - INFO - SELECT * FROM v_airline_vs_month_avg;

@@ -1,0 +1,103 @@
+from sql_scripts import run_execute, logging
+
+def create_table_views(DB_FILE = "../db/flights.db"):
+
+    views = {
+
+        "v_flights_base": """
+        CREATE VIEW IF NOT EXISTS v_flights_base AS
+        SELECT
+            flight_date,
+            airline,
+            flight_number,
+            origin,
+            dest,
+            distance,
+            dep_delay,
+            arr_delay,
+            arr_del15,
+            cancelled,
+            diverted,
+            route
+        FROM flights
+        WHERE cancelled = 0;
+        """,
+
+        "v_airline_delay_stats": """
+        CREATE VIEW IF NOT EXISTS v_airline_delay_stats AS
+        SELECT
+            airline,
+            COUNT(*) AS n_flights,
+            AVG(arr_delay) AS avg_arr_delay,
+            AVG(dep_delay) AS avg_dep_delay,
+            SUM(arr_del15) * 1.0 / COUNT(*) AS pct_arr_del15
+        FROM flights
+        WHERE cancelled = 0
+        GROUP BY airline;
+        """,
+
+        "v_monthly_delays": """
+        CREATE VIEW IF NOT EXISTS v_monthly_delays AS
+        SELECT
+            year,
+            month,
+            AVG(arr_delay) AS avg_arr_delay,
+            COUNT(*) AS n_flights
+        FROM flights
+        WHERE cancelled = 0
+        GROUP BY year, month;
+        """,
+    
+        'v_airline_rolling_metrics': """CREATE VIEW IF NOT EXISTS v_airline_rolling_metrics AS
+                SELECT
+                    year,
+                    month,
+                    airline,
+                    AVG(arr_delay) AS avg_arr_delay,
+
+                    -- rolling 3-month average delay
+                    AVG(AVG(arr_delay)) OVER (
+                        PARTITION BY airline
+                        ORDER BY year, month
+                        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+                    ) AS rolling_3mo_avg_delay,
+
+                    -- rolling flight count
+                    SUM(COUNT(*)) OVER (
+                        PARTITION BY airline
+                        ORDER BY year, month
+                        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+                    ) AS rolling_3mo_flights
+
+                FROM flights
+                WHERE cancelled = 0
+                GROUP BY year, month, airline;
+                """,
+
+                'v_airline_vs_month_avg':   """
+                CREATE VIEW IF NOT EXISTS v_airline_vs_month_avg AS
+                SELECT
+                    year,
+                    month,
+                    airline,
+                    AVG(arr_delay) AS airline_avg_delay,
+                    AVG(AVG(arr_delay)) OVER (
+                        PARTITION BY year, month
+                    ) AS month_avg_delay,
+                    AVG(arr_delay)
+                    - AVG(AVG(arr_delay)) OVER (PARTITION BY year, month)
+                    AS delay_vs_month_avg
+                FROM flights
+                WHERE cancelled = 0
+                GROUP BY year, month, airline;
+                """
+    
+    }
+
+    for name, sql in views.items():
+        run_execute(sql, db_file=DB_FILE)
+        logging.info(f"Created view: {name}")
+
+
+if __name__ == "__main__":
+    create_table_views()
