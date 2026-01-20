@@ -1,11 +1,33 @@
-This repo stores the code and infrastructure to analyze airline flight delays in an automated way. 
-The goal was to be able to take in data from the airline data, provided by the government, shown [here][https://www.transtats.bts.gov/DL_SelectFields.aspx?gnoyr_VQ=FGJ&QO_fu146_anzr=b0-gvzr] and see what insights the data can provide.
+# Airline Delay Analysis Project
 
-I wanted to use this data set to showcase handling of real world data (i.e. Not Astronomy data), use of SQL using sqlite in Python, as well as data anlytics techniques. 
-I wanted to also automate ingestion so that this process is scalable with the addition of new data with the following goals:
-- to run on the fly 
-- append to the database and 
-- recompute tables and quanitites of interest in ones go.
-Due to the on-the-fly nature of this code, it can output tables ready to be used in your favorite vizualization tool of choice such as Tableau, Power BI, etc. 
+This repository contains the code and infrastructure to **analyze airline flight delays in an automated and scalable way**. The goal of the project is to ingest airline data provided by the government, clean and store it in a database, and compute key metrics that can be used for visualization and further analysis.
 
-I have made some Tableau worksheets and can be found here.
+The data is publicly available from the Bureau of Transportation Statistics: [Airline On-Time Performance Data](https://www.transtats.bts.gov/DL_SelectFields.aspx?gnoyr_VQ=FGJ&QO_fu146_anzr=b0-gvzr).
+
+---
+
+## Project Goals
+
+- Handle **real-world data** and demonstrate data engineering and analytics skills.  
+- Use **Python and SQLite** to manage and query the data.  
+- Automate the ingestion process so that the workflow is **scalable** with new incoming data.  
+- Recompute tables and metrics **on-the-fly**, producing outputs ready for visualization in tools like **Tableau**, **Power BI**, or Python plotting libraries.  
+
+---
+
+## Features
+
+- Automated ingestion pipeline for CSV data.  
+- SQLite database integration to store raw and processed data.  
+- Computation of key metrics, such as monthly delays, airline comparisons, and rolling statistics.  
+- Outputs ready for visualization and reporting.  
+
+---
+
+## Usage
+
+1. Clone the repository:
+
+```bash
+git clone git@github.com:astroscar09/airline_delay_project.git
+cd airline_delay_project
