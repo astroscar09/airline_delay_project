@@ -1,8 +1,5 @@
 # Airline Delay Analysis Project
 
-
-# Airline Delay Analysis Project
-
 ![GitHub last commit](https://img.shields.io/github/last-commit/astroscar09/airline_delay_project)
 ![GitHub repo size](https://img.shields.io/github/repo-size/astroscar09/airline_delay_project)
 ![Python Version](https://img.shields.io/badge/python-3.12-blue)
