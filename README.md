@@ -37,3 +37,13 @@ The data is publicly available from the Bureau of Transportation Statistics: [Ai
 ```bash
 git clone https://github.com/astroscar09/airline_delay_project.git
 cd airline_delay_project
+```
+
+2. Download data and store the data into the data/raw folder:
+    - Right now it supports filenames as YYYY_MM_Report.csv
+
+3. Go to the scripts folder and run
+```bash
+python ingest_csv.py --start_year YYYY --end_year YYYY 
+```
+
