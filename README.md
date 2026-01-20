@@ -29,5 +29,5 @@ The data is publicly available from the Bureau of Transportation Statistics: [Ai
 1. Clone the repository:
 
 ```bash
-git clone git@github.com:astroscar09/airline_delay_project.git
+git clone https://github.com/astroscar09/airline_delay_project.git
 cd airline_delay_project
