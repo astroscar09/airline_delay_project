@@ -52,6 +52,7 @@ def make_airline_table(db_file="../db/flights.db"):
                 year INTEGER,
                 month INTEGER,
                 day INTEGER,
+                day_of_week INTEGER,
                 flight_date TEXT,
                 airline TEXT,
                 flight_number INTEGER,
@@ -62,11 +63,36 @@ def make_airline_table(db_file="../db/flights.db"):
                 arr_delay REAL,
                 arr_del15 INTEGER,
                 cancelled INTEGER,
-                diverted INTEGER
+                diverted INTEGER,
+                carrier_delay REAL,
+                weather_delay REAL,
+                nas_delay REAL,
+                security_delay REAL,
+                late_aircraft_delay REAL
             );
             """
 
     run_execute(query, db_file, params=None)
+
+
+def migrate_add_columns(db_file="../db/flights.db"):
+    """Add new columns to an existing flights table if they don't already exist."""
+    pragma_query = "PRAGMA table_info(flights);"
+    existing = run_select(pragma_query, db_file)['name'].tolist()
+
+    new_columns = {
+        "day_of_week": "INTEGER",
+        "carrier_delay": "REAL",
+        "weather_delay": "REAL",
+        "nas_delay": "REAL",
+        "security_delay": "REAL",
+        "late_aircraft_delay": "REAL",
+    }
+
+    for col, col_type in new_columns.items():
+        if col not in existing:
+            run_execute(f"ALTER TABLE flights ADD COLUMN {col} {col_type};", db_file)
+            logging.info(f"Migration: added column {col} to flights table")
 
 
 def make_ingested_table(db_file):

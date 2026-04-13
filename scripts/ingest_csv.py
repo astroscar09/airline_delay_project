@@ -1,6 +1,6 @@
 import pandas as pd
 from sql_scripts import *
-from tqdm import tqdm 
+from tqdm import tqdm
 from create_views import *
 from pathlib import Path
 import argparse
@@ -29,6 +29,7 @@ def read_and_clean_single_file(csv_path):
         "YEAR",
         "MONTH",
         "DAY_OF_MONTH",
+        "DAY_OF_WEEK",
         "FL_DATE",
         "OP_UNIQUE_CARRIER",
         "OP_CARRIER_FL_NUM",
@@ -39,33 +40,45 @@ def read_and_clean_single_file(csv_path):
         "ARR_DELAY",
         "ARR_DEL15",
         "CANCELLED",
-        "DIVERTED"
+        "DIVERTED",
+        "CARRIER_DELAY",
+        "WEATHER_DELAY",
+        "NAS_DELAY",
+        "SECURITY_DELAY",
+        "LATE_AIRCRAFT_DELAY"
     ]
 
     mapping_to_sql_tab = {
         "YEAR": 'year',
         "MONTH": 'month',
-        "DAY_OF_MONTH":'day',
+        "DAY_OF_MONTH": 'day',
+        "DAY_OF_WEEK": 'day_of_week',
         "FL_DATE": 'flight_date',
         "OP_UNIQUE_CARRIER": 'airline',
         "OP_CARRIER_FL_NUM": 'flight_number',
-        "ORIGIN":'origin',
-        "DEST":'dest',
-        "DISTANCE":'distance',
+        "ORIGIN": 'origin',
+        "DEST": 'dest',
+        "DISTANCE": 'distance',
         "DEP_DELAY": 'dep_delay',
-        "ARR_DELAY":'arr_delay',
-        "ARR_DEL15":'arr_del15',
+        "ARR_DELAY": 'arr_delay',
+        "ARR_DEL15": 'arr_del15',
         "CANCELLED": 'cancelled',
-        "DIVERTED": 'diverted'}
-
+        "DIVERTED": 'diverted',
+        "CARRIER_DELAY": 'carrier_delay',
+        "WEATHER_DELAY": 'weather_delay',
+        "NAS_DELAY": 'nas_delay',
+        "SECURITY_DELAY": 'security_delay',
+        "LATE_AIRCRAFT_DELAY": 'late_aircraft_delay',
+    }
 
     # Keep only the columns we want
-
     df_sql = df.copy()[cols_needed]
 
     df_sql = df_sql.rename(columns=mapping_to_sql_tab)
 
-    delay_cols = ["dep_delay", "arr_delay", "arr_del15"]
+    delay_cols = ["dep_delay", "arr_delay", "arr_del15",
+                  "carrier_delay", "weather_delay", "nas_delay",
+                  "security_delay", "late_aircraft_delay"]
     df_sql[delay_cols] = df_sql[delay_cols].fillna(0)
 
     df_sql["arr_del15"] = df_sql["arr_del15"].astype(int)
@@ -220,6 +233,9 @@ def ingestion(db_file,
     #we also make the ingested table to keep track of already ingested files
     make_ingested_table(db_file=db_file)
 
+    #migrate existing databases to include any new columns
+    migrate_add_columns(db_file=db_file)
+
     #we read in the files they should be stored in the ../data/raw/ folder 
     #rn they have the filenames as YEAR_MM_Report.csv
     read_multiple_files(year_start = year_start, 
@@ -253,16 +269,16 @@ def ingestion(db_file,
     #saving the analysis files for visualization purposes
     OUTPUT_FOLDER = "../data/viz_data"
 
-    rolling_metric_file = f"{OUTPUT_FOLDER}/airline_rolling_metrics.csv",
+    rolling_metric_file = f"{OUTPUT_FOLDER}/airline_rolling_metrics.csv"
     delay_stats_file = f"{OUTPUT_FOLDER}/airline_delay_stats.csv"
     monthly_delays_file = f"{OUTPUT_FOLDER}/monthly_delays.csv"
     airline_vs_month_file = f"{OUTPUT_FOLDER}/airline_vs_month_avg.csv"
-    
+
     if not check_files_exists(rolling_metric_file) or reset:
         df = run_select("SELECT * FROM v_airline_rolling_metrics;", db_file=db_file)
         df.to_csv(rolling_metric_file, index=False)
 
-    if not check_files_exists(rolling_metric_file) or reset:
+    if not check_files_exists(delay_stats_file) or reset:
         df = run_select("SELECT * FROM v_airline_delay_stats;", db_file=db_file)
         df.to_csv(delay_stats_file, index=False)
 
@@ -273,6 +289,22 @@ def ingestion(db_file,
     if not check_files_exists(airline_vs_month_file) or reset:
         df = run_select("SELECT * FROM v_airline_vs_month_avg;", db_file=db_file)
         df.to_csv(f"{OUTPUT_FOLDER}/airline_vs_month_avg.csv", index=False)
+
+    delay_causes_file = f"{OUTPUT_FOLDER}/delay_causes_by_airline.csv"
+    route_stats_file = f"{OUTPUT_FOLDER}/route_delay_stats.csv"
+    airport_stats_file = f"{OUTPUT_FOLDER}/airport_delay_stats.csv"
+
+    if not check_files_exists(delay_causes_file) or reset:
+        df = run_select("SELECT * FROM v_delay_causes_by_airline;", db_file=db_file)
+        df.to_csv(delay_causes_file, index=False)
+
+    if not check_files_exists(route_stats_file) or reset:
+        df = run_select("SELECT * FROM v_route_delay_stats;", db_file=db_file)
+        df.to_csv(route_stats_file, index=False)
+
+    if not check_files_exists(airport_stats_file) or reset:
+        df = run_select("SELECT * FROM v_airport_delay_stats;", db_file=db_file)
+        df.to_csv(airport_stats_file, index=False)
 
 if __name__ == '__main__':
 

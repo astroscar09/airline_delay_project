@@ -639,3 +639,763 @@
 2026-01-19 11:55:07,649 - INFO - SELECT * FROM v_monthly_delays;
 2026-01-19 11:55:15,937 - INFO - Executing SQL query
 2026-01-19 11:55:15,937 - INFO - SELECT * FROM v_airline_vs_month_avg;
+2026-04-12 18:49:34,483 - INFO - Executing SQL query
+2026-04-12 18:49:34,484 - INFO - 
+            CREATE TABLE IF NOT EXISTS flights (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                year INTEGER,
+                month INTEGER,
+                day INTEGER,
+                day_of_week INTEGER,
+                flight_date TEXT,
+                airline TEXT,
+                flight_number INTEGER,
+                origin TEXT,
+                dest TEXT,
+                distance REAL,
+                dep_delay REAL,
+                arr_delay REAL,
+                arr_del15 INTEGER,
+                cancelled INTEGER,
+                diverted INTEGER,
+                carrier_delay REAL,
+                weather_delay REAL,
+                nas_delay REAL,
+                security_delay REAL,
+                late_aircraft_delay REAL
+            );
+            
+2026-04-12 18:49:34,488 - INFO - Executing SQL query
+2026-04-12 18:49:34,488 - INFO - 
+            CREATE TABLE IF NOT EXISTS ingested_files (
+            file_name TEXT PRIMARY KEY,
+            year INTEGER,
+            month INTEGER,
+            ingested_at TEXT,
+            n_rows INTEGER,
+            status TEXT   -- 'success' | 'failed'
+            );
+            
+2026-04-12 18:49:34,489 - INFO - Executing SQL query
+2026-04-12 18:49:34,489 - INFO - PRAGMA table_info(flights);
+2026-04-12 18:49:34,519 - INFO - Executing SQL query
+2026-04-12 18:49:34,520 - INFO - ALTER TABLE flights ADD COLUMN day_of_week INTEGER;
+2026-04-12 18:49:34,524 - INFO - Migration: added column day_of_week to flights table
+2026-04-12 18:49:34,524 - INFO - Executing SQL query
+2026-04-12 18:49:34,524 - INFO - ALTER TABLE flights ADD COLUMN carrier_delay REAL;
+2026-04-12 18:49:34,530 - INFO - Migration: added column carrier_delay to flights table
+2026-04-12 18:49:34,530 - INFO - Executing SQL query
+2026-04-12 18:49:34,530 - INFO - ALTER TABLE flights ADD COLUMN weather_delay REAL;
+2026-04-12 18:49:34,535 - INFO - Migration: added column weather_delay to flights table
+2026-04-12 18:49:34,535 - INFO - Executing SQL query
+2026-04-12 18:49:34,535 - INFO - ALTER TABLE flights ADD COLUMN nas_delay REAL;
+2026-04-12 18:49:34,540 - INFO - Migration: added column nas_delay to flights table
+2026-04-12 18:49:34,540 - INFO - Executing SQL query
+2026-04-12 18:49:34,540 - INFO - ALTER TABLE flights ADD COLUMN security_delay REAL;
+2026-04-12 18:49:34,545 - INFO - Migration: added column security_delay to flights table
+2026-04-12 18:49:34,545 - INFO - Executing SQL query
+2026-04-12 18:49:34,545 - INFO - ALTER TABLE flights ADD COLUMN late_aircraft_delay REAL;
+2026-04-12 18:49:34,551 - INFO - Migration: added column late_aircraft_delay to flights table
+2026-04-12 18:49:34,551 - INFO - Reset flag is True: clearing flights and ingestion log tables
+2026-04-12 18:51:31,200 - INFO - Executing SQL query
+2026-04-12 18:51:31,201 - INFO - 
+            CREATE TABLE IF NOT EXISTS flights (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                year INTEGER,
+                month INTEGER,
+                day INTEGER,
+                day_of_week INTEGER,
+                flight_date TEXT,
+                airline TEXT,
+                flight_number INTEGER,
+                origin TEXT,
+                dest TEXT,
+                distance REAL,
+                dep_delay REAL,
+                arr_delay REAL,
+                arr_del15 INTEGER,
+                cancelled INTEGER,
+                diverted INTEGER,
+                carrier_delay REAL,
+                weather_delay REAL,
+                nas_delay REAL,
+                security_delay REAL,
+                late_aircraft_delay REAL
+            );
+            
+2026-04-12 18:51:31,203 - INFO - Executing SQL query
+2026-04-12 18:51:31,204 - INFO - 
+            CREATE TABLE IF NOT EXISTS ingested_files (
+            file_name TEXT PRIMARY KEY,
+            year INTEGER,
+            month INTEGER,
+            ingested_at TEXT,
+            n_rows INTEGER,
+            status TEXT   -- 'success' | 'failed'
+            );
+            
+2026-04-12 18:51:31,204 - INFO - Executing SQL query
+2026-04-12 18:51:31,205 - INFO - PRAGMA table_info(flights);
+2026-04-12 18:51:31,216 - INFO - Reset flag is True: clearing flights and ingestion log tables
+2026-04-12 18:51:50,455 - INFO - Processing csv file: ../data/raw/2024_01_Report.csv
+2026-04-12 18:52:00,656 - INFO - Processing csv file: ../data/raw/2024_02_Report.csv
+2026-04-12 18:52:13,255 - INFO - Executing SQL query
+2026-04-12 18:52:13,255 - INFO - PRAGMA table_info(flights);
+2026-04-12 18:52:13,270 - INFO - Executing SQL query
+2026-04-12 18:52:13,270 - INFO - 
+                      UPDATE flights
+                      SET route = origin || '-' || dest
+                      WHERE route IS NULL;
+                      
+2026-04-12 18:52:16,125 - INFO - Executing SQL query
+2026-04-12 18:52:16,126 - INFO - CREATE INDEX IF NOT EXISTS idx_flight_date ON flights(flight_date);
+2026-04-12 18:52:16,128 - INFO - Executing SQL query
+2026-04-12 18:52:16,128 - INFO - CREATE INDEX IF NOT EXISTS idx_origin_dest ON flights(origin, dest);
+2026-04-12 18:52:16,129 - INFO - Executing SQL query
+2026-04-12 18:52:16,129 - INFO - CREATE INDEX IF NOT EXISTS idx_airline ON flights(airline);
+2026-04-12 18:52:16,130 - INFO - Executing SQL query
+2026-04-12 18:52:16,130 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_flights_base AS
+        SELECT
+            flight_date,
+            airline,
+            flight_number,
+            origin,
+            dest,
+            distance,
+            dep_delay,
+            arr_delay,
+            arr_del15,
+            cancelled,
+            diverted,
+            route
+        FROM flights
+        WHERE cancelled = 0;
+        
+2026-04-12 18:52:16,131 - INFO - Created view: v_flights_base
+2026-04-12 18:52:16,131 - INFO - Executing SQL query
+2026-04-12 18:52:16,131 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_airline_delay_stats AS
+        SELECT
+            airline,
+            COUNT(*) AS n_flights,
+            AVG(arr_delay) AS avg_arr_delay,
+            AVG(dep_delay) AS avg_dep_delay,
+            SUM(arr_del15) * 1.0 / COUNT(*) AS pct_arr_del15
+        FROM flights
+        WHERE cancelled = 0
+        GROUP BY airline;
+        
+2026-04-12 18:52:16,132 - INFO - Created view: v_airline_delay_stats
+2026-04-12 18:52:16,132 - INFO - Executing SQL query
+2026-04-12 18:52:16,132 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_monthly_delays AS
+        SELECT
+            year,
+            month,
+            AVG(arr_delay) AS avg_arr_delay,
+            COUNT(*) AS n_flights
+        FROM flights
+        WHERE cancelled = 0
+        GROUP BY year, month;
+        
+2026-04-12 18:52:16,133 - INFO - Created view: v_monthly_delays
+2026-04-12 18:52:16,133 - INFO - Executing SQL query
+2026-04-12 18:52:16,133 - INFO - CREATE VIEW IF NOT EXISTS v_airline_rolling_metrics AS
+                SELECT
+                    year,
+                    month,
+                    airline,
+                    AVG(arr_delay) AS avg_arr_delay,
+
+                    -- rolling 3-month average delay
+                    AVG(AVG(arr_delay)) OVER (
+                        PARTITION BY airline
+                        ORDER BY year, month
+                        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+                    ) AS rolling_3mo_avg_delay,
+
+                    -- rolling flight count
+                    SUM(COUNT(*)) OVER (
+                        PARTITION BY airline
+                        ORDER BY year, month
+                        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+                    ) AS rolling_3mo_flights
+
+                FROM flights
+                WHERE cancelled = 0
+                GROUP BY year, month, airline;
+                
+2026-04-12 18:52:16,134 - INFO - Created view: v_airline_rolling_metrics
+2026-04-12 18:52:16,134 - INFO - Executing SQL query
+2026-04-12 18:52:16,134 - INFO - 
+                CREATE VIEW IF NOT EXISTS v_airline_vs_month_avg AS
+                SELECT
+                    year,
+                    month,
+                    airline,
+                    AVG(arr_delay) AS airline_avg_delay,
+                    AVG(AVG(arr_delay)) OVER (
+                        PARTITION BY year, month
+                    ) AS month_avg_delay,
+                    AVG(arr_delay)
+                    - AVG(AVG(arr_delay)) OVER (PARTITION BY year, month)
+                    AS delay_vs_month_avg
+                FROM flights
+                WHERE cancelled = 0
+                GROUP BY year, month, airline;
+                
+2026-04-12 18:52:16,135 - INFO - Created view: v_airline_vs_month_avg
+2026-04-12 18:52:16,135 - INFO - Executing SQL query
+2026-04-12 18:52:16,135 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_delay_causes_by_airline AS
+        SELECT
+            airline,
+            COUNT(*) AS n_delayed_flights,
+            AVG(carrier_delay) AS avg_carrier_delay,
+            AVG(weather_delay) AS avg_weather_delay,
+            AVG(nas_delay) AS avg_nas_delay,
+            AVG(security_delay) AS avg_security_delay,
+            AVG(late_aircraft_delay) AS avg_late_aircraft_delay
+        FROM flights
+        WHERE cancelled = 0
+          AND (carrier_delay > 0 OR weather_delay > 0 OR nas_delay > 0
+               OR security_delay > 0 OR late_aircraft_delay > 0)
+        GROUP BY airline;
+        
+2026-04-12 18:52:16,139 - INFO - Created view: v_delay_causes_by_airline
+2026-04-12 18:52:16,139 - INFO - Executing SQL query
+2026-04-12 18:52:16,139 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_route_delay_stats AS
+        SELECT
+            route,
+            origin,
+            dest,
+            COUNT(*) AS n_flights,
+            AVG(arr_delay) AS avg_arr_delay,
+            AVG(dep_delay) AS avg_dep_delay,
+            SUM(arr_del15) * 1.0 / COUNT(*) AS pct_arr_del15
+        FROM flights
+        WHERE cancelled = 0
+        GROUP BY route, origin, dest;
+        
+2026-04-12 18:52:16,145 - INFO - Created view: v_route_delay_stats
+2026-04-12 18:52:16,145 - INFO - Executing SQL query
+2026-04-12 18:52:16,145 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_airport_delay_stats AS
+        SELECT
+            origin AS airport,
+            COUNT(*) AS n_departures,
+            AVG(dep_delay) AS avg_dep_delay,
+            SUM(arr_del15) * 1.0 / COUNT(*) AS pct_arr_del15,
+            SUM(cancelled) * 1.0 / (COUNT(*) + SUM(cancelled)) AS cancellation_rate
+        FROM flights
+        GROUP BY origin;
+        
+2026-04-12 18:52:16,151 - INFO - Created view: v_airport_delay_stats
+2026-04-12 18:52:16,151 - INFO - Executing SQL query
+2026-04-12 18:52:16,151 - INFO - 
+                SELECT * 
+                FROM flights
+                LIMIT 10;
+            
+2026-04-12 18:52:16,156 - INFO -  
+2026-04-12 18:52:16,206 - INFO -          id  year  month  day           flight_date  ... carrier_delay  weather_delay nas_delay security_delay  late_aircraft_delay
+0  25855693  2024      1    1  1/1/2024 12:00:00 AM  ...           0.0            0.0       0.0            0.0                  0.0
+1  25855694  2024      1    1  1/1/2024 12:00:00 AM  ...           0.0            0.0       0.0            0.0                  0.0
+2  25855695  2024      1    1  1/1/2024 12:00:00 AM  ...           0.0            0.0       0.0            0.0                  0.0
+3  25855696  2024      1    1  1/1/2024 12:00:00 AM  ...           0.0            0.0       0.0            0.0                  0.0
+4  25855697  2024      1    1  1/1/2024 12:00:00 AM  ...           0.0            0.0       0.0            0.0                  0.0
+5  25855698  2024      1    1  1/1/2024 12:00:00 AM  ...           0.0            0.0       0.0            0.0                  0.0
+6  25855699  2024      1    1  1/1/2024 12:00:00 AM  ...           0.0            0.0       0.0            0.0                  0.0
+7  25855700  2024      1    1  1/1/2024 12:00:00 AM  ...           0.0            0.0       0.0            0.0                  0.0
+8  25855701  2024      1    1  1/1/2024 12:00:00 AM  ...           0.0            0.0       0.0            0.0                  0.0
+9  25855702  2024      1    1  1/1/2024 12:00:00 AM  ...           0.0            0.0       0.0            0.0                  0.0
+
+[10 rows x 22 columns]
+2026-04-12 18:52:16,207 - INFO -  
+2026-04-12 18:52:16,207 - INFO - Executing SQL query
+2026-04-12 18:52:16,207 - INFO - 
+                SELECT * 
+                FROM ingested_files
+                LIMIT 10;
+            
+2026-04-12 18:52:16,209 - INFO -  
+2026-04-12 18:52:16,216 - INFO -                         file_name  year  month                ingested_at  n_rows   status
+0  ../data/raw/2024_01_Report.csv  2024      1  2026-04-12T23:52:00+00:00  547271  success
+1  ../data/raw/2024_02_Report.csv  2024      2  2026-04-12T23:52:13+00:00  519221  success
+2026-04-12 18:52:16,216 - INFO -  
+2026-04-12 18:53:41,012 - INFO - Executing SQL query
+2026-04-12 18:53:41,012 - INFO - 
+            CREATE TABLE IF NOT EXISTS flights (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                year INTEGER,
+                month INTEGER,
+                day INTEGER,
+                day_of_week INTEGER,
+                flight_date TEXT,
+                airline TEXT,
+                flight_number INTEGER,
+                origin TEXT,
+                dest TEXT,
+                distance REAL,
+                dep_delay REAL,
+                arr_delay REAL,
+                arr_del15 INTEGER,
+                cancelled INTEGER,
+                diverted INTEGER,
+                carrier_delay REAL,
+                weather_delay REAL,
+                nas_delay REAL,
+                security_delay REAL,
+                late_aircraft_delay REAL
+            );
+            
+2026-04-12 18:53:41,014 - INFO - Executing SQL query
+2026-04-12 18:53:41,014 - INFO - 
+            CREATE TABLE IF NOT EXISTS ingested_files (
+            file_name TEXT PRIMARY KEY,
+            year INTEGER,
+            month INTEGER,
+            ingested_at TEXT,
+            n_rows INTEGER,
+            status TEXT   -- 'success' | 'failed'
+            );
+            
+2026-04-12 18:53:41,014 - INFO - Executing SQL query
+2026-04-12 18:53:41,014 - INFO - PRAGMA table_info(flights);
+2026-04-12 18:53:41,025 - INFO - Reset flag is True: clearing flights and ingestion log tables
+2026-04-12 18:53:44,221 - INFO - Processing csv file: ../data/raw/2024_01_Report.csv
+2026-04-12 18:53:54,815 - INFO - Processing csv file: ../data/raw/2024_02_Report.csv
+2026-04-12 18:54:08,153 - INFO - Executing SQL query
+2026-04-12 18:54:08,153 - INFO - PRAGMA table_info(flights);
+2026-04-12 18:54:08,158 - INFO - Executing SQL query
+2026-04-12 18:54:08,158 - INFO - 
+                      UPDATE flights
+                      SET route = origin || '-' || dest
+                      WHERE route IS NULL;
+                      
+2026-04-12 18:54:10,966 - INFO - Executing SQL query
+2026-04-12 18:54:10,966 - INFO - CREATE INDEX IF NOT EXISTS idx_flight_date ON flights(flight_date);
+2026-04-12 18:54:10,969 - INFO - Executing SQL query
+2026-04-12 18:54:10,969 - INFO - CREATE INDEX IF NOT EXISTS idx_origin_dest ON flights(origin, dest);
+2026-04-12 18:54:10,971 - INFO - Executing SQL query
+2026-04-12 18:54:10,971 - INFO - CREATE INDEX IF NOT EXISTS idx_airline ON flights(airline);
+2026-04-12 18:54:10,972 - INFO - Executing SQL query
+2026-04-12 18:54:10,973 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_flights_base AS
+        SELECT
+            flight_date,
+            airline,
+            flight_number,
+            origin,
+            dest,
+            distance,
+            dep_delay,
+            arr_delay,
+            arr_del15,
+            cancelled,
+            diverted,
+            route
+        FROM flights
+        WHERE cancelled = 0;
+        
+2026-04-12 18:54:10,974 - INFO - Created view: v_flights_base
+2026-04-12 18:54:10,974 - INFO - Executing SQL query
+2026-04-12 18:54:10,974 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_airline_delay_stats AS
+        SELECT
+            airline,
+            COUNT(*) AS n_flights,
+            AVG(arr_delay) AS avg_arr_delay,
+            AVG(dep_delay) AS avg_dep_delay,
+            SUM(arr_del15) * 1.0 / COUNT(*) AS pct_arr_del15
+        FROM flights
+        WHERE cancelled = 0
+        GROUP BY airline;
+        
+2026-04-12 18:54:10,975 - INFO - Created view: v_airline_delay_stats
+2026-04-12 18:54:10,975 - INFO - Executing SQL query
+2026-04-12 18:54:10,975 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_monthly_delays AS
+        SELECT
+            year,
+            month,
+            AVG(arr_delay) AS avg_arr_delay,
+            COUNT(*) AS n_flights
+        FROM flights
+        WHERE cancelled = 0
+        GROUP BY year, month;
+        
+2026-04-12 18:54:10,975 - INFO - Created view: v_monthly_delays
+2026-04-12 18:54:10,975 - INFO - Executing SQL query
+2026-04-12 18:54:10,975 - INFO - CREATE VIEW IF NOT EXISTS v_airline_rolling_metrics AS
+                SELECT
+                    year,
+                    month,
+                    airline,
+                    AVG(arr_delay) AS avg_arr_delay,
+
+                    -- rolling 3-month average delay
+                    AVG(AVG(arr_delay)) OVER (
+                        PARTITION BY airline
+                        ORDER BY year, month
+                        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+                    ) AS rolling_3mo_avg_delay,
+
+                    -- rolling flight count
+                    SUM(COUNT(*)) OVER (
+                        PARTITION BY airline
+                        ORDER BY year, month
+                        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+                    ) AS rolling_3mo_flights
+
+                FROM flights
+                WHERE cancelled = 0
+                GROUP BY year, month, airline;
+                
+2026-04-12 18:54:10,976 - INFO - Created view: v_airline_rolling_metrics
+2026-04-12 18:54:10,976 - INFO - Executing SQL query
+2026-04-12 18:54:10,977 - INFO - 
+                CREATE VIEW IF NOT EXISTS v_airline_vs_month_avg AS
+                SELECT
+                    year,
+                    month,
+                    airline,
+                    AVG(arr_delay) AS airline_avg_delay,
+                    AVG(AVG(arr_delay)) OVER (
+                        PARTITION BY year, month
+                    ) AS month_avg_delay,
+                    AVG(arr_delay)
+                    - AVG(AVG(arr_delay)) OVER (PARTITION BY year, month)
+                    AS delay_vs_month_avg
+                FROM flights
+                WHERE cancelled = 0
+                GROUP BY year, month, airline;
+                
+2026-04-12 18:54:10,978 - INFO - Created view: v_airline_vs_month_avg
+2026-04-12 18:54:10,978 - INFO - Executing SQL query
+2026-04-12 18:54:10,978 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_delay_causes_by_airline AS
+        SELECT
+            airline,
+            COUNT(*) AS n_delayed_flights,
+            AVG(carrier_delay) AS avg_carrier_delay,
+            AVG(weather_delay) AS avg_weather_delay,
+            AVG(nas_delay) AS avg_nas_delay,
+            AVG(security_delay) AS avg_security_delay,
+            AVG(late_aircraft_delay) AS avg_late_aircraft_delay
+        FROM flights
+        WHERE cancelled = 0
+          AND (carrier_delay > 0 OR weather_delay > 0 OR nas_delay > 0
+               OR security_delay > 0 OR late_aircraft_delay > 0)
+        GROUP BY airline;
+        
+2026-04-12 18:54:10,979 - INFO - Created view: v_delay_causes_by_airline
+2026-04-12 18:54:10,979 - INFO - Executing SQL query
+2026-04-12 18:54:10,979 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_route_delay_stats AS
+        SELECT
+            route,
+            origin,
+            dest,
+            COUNT(*) AS n_flights,
+            AVG(arr_delay) AS avg_arr_delay,
+            AVG(dep_delay) AS avg_dep_delay,
+            SUM(arr_del15) * 1.0 / COUNT(*) AS pct_arr_del15
+        FROM flights
+        WHERE cancelled = 0
+        GROUP BY route, origin, dest;
+        
+2026-04-12 18:54:10,980 - INFO - Created view: v_route_delay_stats
+2026-04-12 18:54:10,980 - INFO - Executing SQL query
+2026-04-12 18:54:10,980 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_airport_delay_stats AS
+        SELECT
+            origin AS airport,
+            COUNT(*) AS n_departures,
+            AVG(dep_delay) AS avg_dep_delay,
+            SUM(arr_del15) * 1.0 / COUNT(*) AS pct_arr_del15,
+            SUM(cancelled) * 1.0 / (COUNT(*) + SUM(cancelled)) AS cancellation_rate
+        FROM flights
+        GROUP BY origin;
+        
+2026-04-12 18:54:10,980 - INFO - Created view: v_airport_delay_stats
+2026-04-12 18:54:10,981 - INFO - Executing SQL query
+2026-04-12 18:54:10,981 - INFO - 
+                SELECT * 
+                FROM flights
+                LIMIT 10;
+            
+2026-04-12 18:54:10,984 - INFO -  
+2026-04-12 18:54:11,015 - INFO -          id  year  month  ...  nas_delay security_delay late_aircraft_delay
+0  26922185  2024      1  ...        0.0            0.0                 0.0
+1  26922186  2024      1  ...        0.0            0.0                 0.0
+2  26922187  2024      1  ...        0.0            0.0                 0.0
+3  26922188  2024      1  ...        0.0            0.0                 0.0
+4  26922189  2024      1  ...        0.0            0.0                 0.0
+5  26922190  2024      1  ...        0.0            0.0                 0.0
+6  26922191  2024      1  ...        0.0            0.0                 0.0
+7  26922192  2024      1  ...        0.0            0.0                 0.0
+8  26922193  2024      1  ...        0.0            0.0                 0.0
+9  26922194  2024      1  ...        0.0            0.0                 0.0
+
+[10 rows x 22 columns]
+2026-04-12 18:54:11,015 - INFO -  
+2026-04-12 18:54:11,015 - INFO - Executing SQL query
+2026-04-12 18:54:11,015 - INFO - 
+                SELECT * 
+                FROM ingested_files
+                LIMIT 10;
+            
+2026-04-12 18:54:11,017 - INFO -  
+2026-04-12 18:54:11,025 - INFO -                         file_name  year  ...  n_rows   status
+0  ../data/raw/2024_01_Report.csv  2024  ...  547271  success
+1  ../data/raw/2024_02_Report.csv  2024  ...  519221  success
+
+[2 rows x 6 columns]
+2026-04-12 18:54:11,025 - INFO -  
+2026-04-12 18:54:49,734 - INFO - Executing SQL query
+2026-04-12 18:54:49,734 - INFO - 
+            CREATE TABLE IF NOT EXISTS flights (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                year INTEGER,
+                month INTEGER,
+                day INTEGER,
+                day_of_week INTEGER,
+                flight_date TEXT,
+                airline TEXT,
+                flight_number INTEGER,
+                origin TEXT,
+                dest TEXT,
+                distance REAL,
+                dep_delay REAL,
+                arr_delay REAL,
+                arr_del15 INTEGER,
+                cancelled INTEGER,
+                diverted INTEGER,
+                carrier_delay REAL,
+                weather_delay REAL,
+                nas_delay REAL,
+                security_delay REAL,
+                late_aircraft_delay REAL
+            );
+            
+2026-04-12 18:54:49,736 - INFO - Executing SQL query
+2026-04-12 18:54:49,736 - INFO - 
+            CREATE TABLE IF NOT EXISTS ingested_files (
+            file_name TEXT PRIMARY KEY,
+            year INTEGER,
+            month INTEGER,
+            ingested_at TEXT,
+            n_rows INTEGER,
+            status TEXT   -- 'success' | 'failed'
+            );
+            
+2026-04-12 18:54:49,737 - INFO - Executing SQL query
+2026-04-12 18:54:49,737 - INFO - PRAGMA table_info(flights);
+2026-04-12 18:54:49,747 - INFO - Reset flag is True: clearing flights and ingestion log tables
+2026-04-12 18:54:52,426 - INFO - Processing csv file: ../data/raw/2024_01_Report.csv
+2026-04-12 18:55:03,288 - INFO - Processing csv file: ../data/raw/2024_02_Report.csv
+2026-04-12 18:55:16,743 - INFO - Executing SQL query
+2026-04-12 18:55:16,743 - INFO - PRAGMA table_info(flights);
+2026-04-12 18:55:16,748 - INFO - Executing SQL query
+2026-04-12 18:55:16,748 - INFO - 
+                      UPDATE flights
+                      SET route = origin || '-' || dest
+                      WHERE route IS NULL;
+                      
+2026-04-12 18:55:19,621 - INFO - Executing SQL query
+2026-04-12 18:55:19,621 - INFO - CREATE INDEX IF NOT EXISTS idx_flight_date ON flights(flight_date);
+2026-04-12 18:55:19,624 - INFO - Executing SQL query
+2026-04-12 18:55:19,625 - INFO - CREATE INDEX IF NOT EXISTS idx_origin_dest ON flights(origin, dest);
+2026-04-12 18:55:19,625 - INFO - Executing SQL query
+2026-04-12 18:55:19,626 - INFO - CREATE INDEX IF NOT EXISTS idx_airline ON flights(airline);
+2026-04-12 18:55:19,627 - INFO - Executing SQL query
+2026-04-12 18:55:19,627 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_flights_base AS
+        SELECT
+            flight_date,
+            airline,
+            flight_number,
+            origin,
+            dest,
+            distance,
+            dep_delay,
+            arr_delay,
+            arr_del15,
+            cancelled,
+            diverted,
+            route
+        FROM flights
+        WHERE cancelled = 0;
+        
+2026-04-12 18:55:19,628 - INFO - Created view: v_flights_base
+2026-04-12 18:55:19,628 - INFO - Executing SQL query
+2026-04-12 18:55:19,628 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_airline_delay_stats AS
+        SELECT
+            airline,
+            COUNT(*) AS n_flights,
+            AVG(arr_delay) AS avg_arr_delay,
+            AVG(dep_delay) AS avg_dep_delay,
+            SUM(arr_del15) * 1.0 / COUNT(*) AS pct_arr_del15
+        FROM flights
+        WHERE cancelled = 0
+        GROUP BY airline;
+        
+2026-04-12 18:55:19,628 - INFO - Created view: v_airline_delay_stats
+2026-04-12 18:55:19,628 - INFO - Executing SQL query
+2026-04-12 18:55:19,628 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_monthly_delays AS
+        SELECT
+            year,
+            month,
+            AVG(arr_delay) AS avg_arr_delay,
+            COUNT(*) AS n_flights
+        FROM flights
+        WHERE cancelled = 0
+        GROUP BY year, month;
+        
+2026-04-12 18:55:19,629 - INFO - Created view: v_monthly_delays
+2026-04-12 18:55:19,629 - INFO - Executing SQL query
+2026-04-12 18:55:19,629 - INFO - CREATE VIEW IF NOT EXISTS v_airline_rolling_metrics AS
+                SELECT
+                    year,
+                    month,
+                    airline,
+                    AVG(arr_delay) AS avg_arr_delay,
+
+                    -- rolling 3-month average delay
+                    AVG(AVG(arr_delay)) OVER (
+                        PARTITION BY airline
+                        ORDER BY year, month
+                        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+                    ) AS rolling_3mo_avg_delay,
+
+                    -- rolling flight count
+                    SUM(COUNT(*)) OVER (
+                        PARTITION BY airline
+                        ORDER BY year, month
+                        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+                    ) AS rolling_3mo_flights
+
+                FROM flights
+                WHERE cancelled = 0
+                GROUP BY year, month, airline;
+                
+2026-04-12 18:55:19,630 - INFO - Created view: v_airline_rolling_metrics
+2026-04-12 18:55:19,630 - INFO - Executing SQL query
+2026-04-12 18:55:19,630 - INFO - 
+                CREATE VIEW IF NOT EXISTS v_airline_vs_month_avg AS
+                SELECT
+                    year,
+                    month,
+                    airline,
+                    AVG(arr_delay) AS airline_avg_delay,
+                    AVG(AVG(arr_delay)) OVER (
+                        PARTITION BY year, month
+                    ) AS month_avg_delay,
+                    AVG(arr_delay)
+                    - AVG(AVG(arr_delay)) OVER (PARTITION BY year, month)
+                    AS delay_vs_month_avg
+                FROM flights
+                WHERE cancelled = 0
+                GROUP BY year, month, airline;
+                
+2026-04-12 18:55:19,631 - INFO - Created view: v_airline_vs_month_avg
+2026-04-12 18:55:19,631 - INFO - Executing SQL query
+2026-04-12 18:55:19,631 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_delay_causes_by_airline AS
+        SELECT
+            airline,
+            COUNT(*) AS n_delayed_flights,
+            AVG(carrier_delay) AS avg_carrier_delay,
+            AVG(weather_delay) AS avg_weather_delay,
+            AVG(nas_delay) AS avg_nas_delay,
+            AVG(security_delay) AS avg_security_delay,
+            AVG(late_aircraft_delay) AS avg_late_aircraft_delay
+        FROM flights
+        WHERE cancelled = 0
+          AND (carrier_delay > 0 OR weather_delay > 0 OR nas_delay > 0
+               OR security_delay > 0 OR late_aircraft_delay > 0)
+        GROUP BY airline;
+        
+2026-04-12 18:55:19,632 - INFO - Created view: v_delay_causes_by_airline
+2026-04-12 18:55:19,632 - INFO - Executing SQL query
+2026-04-12 18:55:19,632 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_route_delay_stats AS
+        SELECT
+            route,
+            origin,
+            dest,
+            COUNT(*) AS n_flights,
+            AVG(arr_delay) AS avg_arr_delay,
+            AVG(dep_delay) AS avg_dep_delay,
+            SUM(arr_del15) * 1.0 / COUNT(*) AS pct_arr_del15
+        FROM flights
+        WHERE cancelled = 0
+        GROUP BY route, origin, dest;
+        
+2026-04-12 18:55:19,633 - INFO - Created view: v_route_delay_stats
+2026-04-12 18:55:19,633 - INFO - Executing SQL query
+2026-04-12 18:55:19,633 - INFO - 
+        CREATE VIEW IF NOT EXISTS v_airport_delay_stats AS
+        SELECT
+            origin AS airport,
+            COUNT(*) AS n_departures,
+            AVG(dep_delay) AS avg_dep_delay,
+            SUM(arr_del15) * 1.0 / COUNT(*) AS pct_arr_del15,
+            SUM(cancelled) * 1.0 / (COUNT(*) + SUM(cancelled)) AS cancellation_rate
+        FROM flights
+        GROUP BY origin;
+        
+2026-04-12 18:55:19,634 - INFO - Created view: v_airport_delay_stats
+2026-04-12 18:55:19,634 - INFO - Executing SQL query
+2026-04-12 18:55:19,634 - INFO - 
+                SELECT * 
+                FROM flights
+                LIMIT 10;
+            
+2026-04-12 18:55:19,637 - INFO -  
+2026-04-12 18:55:19,663 - INFO -          id  year  month  ...  nas_delay security_delay late_aircraft_delay
+0  27988677  2024      1  ...        0.0            0.0                 0.0
+1  27988678  2024      1  ...        0.0            0.0                 0.0
+2  27988679  2024      1  ...        0.0            0.0                 0.0
+3  27988680  2024      1  ...        0.0            0.0                 0.0
+4  27988681  2024      1  ...        0.0            0.0                 0.0
+5  27988682  2024      1  ...        0.0            0.0                 0.0
+6  27988683  2024      1  ...        0.0            0.0                 0.0
+7  27988684  2024      1  ...        0.0            0.0                 0.0
+8  27988685  2024      1  ...        0.0            0.0                 0.0
+9  27988686  2024      1  ...        0.0            0.0                 0.0
+
+[10 rows x 22 columns]
+2026-04-12 18:55:19,664 - INFO -  
+2026-04-12 18:55:19,664 - INFO - Executing SQL query
+2026-04-12 18:55:19,664 - INFO - 
+                SELECT * 
+                FROM ingested_files
+                LIMIT 10;
+            
+2026-04-12 18:55:19,666 - INFO -  
+2026-04-12 18:55:19,673 - INFO -                         file_name  year  ...  n_rows   status
+0  ../data/raw/2024_01_Report.csv  2024  ...  547271  success
+1  ../data/raw/2024_02_Report.csv  2024  ...  519221  success
+
+[2 rows x 6 columns]
+2026-04-12 18:55:19,673 - INFO -  
+2026-04-12 18:55:19,673 - INFO - Executing SQL query
+2026-04-12 18:55:19,674 - INFO - SELECT * FROM v_airline_rolling_metrics;
+2026-04-12 18:55:20,886 - INFO - Executing SQL query
+2026-04-12 18:55:20,886 - INFO - SELECT * FROM v_airline_delay_stats;
+2026-04-12 18:55:21,267 - INFO - Executing SQL query
+2026-04-12 18:55:21,267 - INFO - SELECT * FROM v_monthly_delays;
+2026-04-12 18:55:22,066 - INFO - Executing SQL query
+2026-04-12 18:55:22,066 - INFO - SELECT * FROM v_airline_vs_month_avg;
+2026-04-12 18:55:23,276 - INFO - Executing SQL query
+2026-04-12 18:55:23,276 - INFO - SELECT * FROM v_delay_causes_by_airline;
+2026-04-12 18:55:23,699 - INFO - Executing SQL query
+2026-04-12 18:55:23,699 - INFO - SELECT * FROM v_route_delay_stats;
+2026-04-12 18:55:25,459 - INFO - Executing SQL query
+2026-04-12 18:55:25,459 - INFO - SELECT * FROM v_airport_delay_stats;

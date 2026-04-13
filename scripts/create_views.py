@@ -1,3 +1,4 @@
+from tqdm import tqdm
 from sql_scripts import run_execute, logging
 
 def create_table_views(DB_FILE = "../db/flights.db"):
@@ -90,11 +91,55 @@ def create_table_views(DB_FILE = "../db/flights.db"):
                 FROM flights
                 WHERE cancelled = 0
                 GROUP BY year, month, airline;
-                """
-    
+                """,
+
+        "v_delay_causes_by_airline": """
+        CREATE VIEW IF NOT EXISTS v_delay_causes_by_airline AS
+        SELECT
+            airline,
+            COUNT(*) AS n_delayed_flights,
+            AVG(carrier_delay) AS avg_carrier_delay,
+            AVG(weather_delay) AS avg_weather_delay,
+            AVG(nas_delay) AS avg_nas_delay,
+            AVG(security_delay) AS avg_security_delay,
+            AVG(late_aircraft_delay) AS avg_late_aircraft_delay
+        FROM flights
+        WHERE cancelled = 0
+          AND (carrier_delay > 0 OR weather_delay > 0 OR nas_delay > 0
+               OR security_delay > 0 OR late_aircraft_delay > 0)
+        GROUP BY airline;
+        """,
+
+        "v_route_delay_stats": """
+        CREATE VIEW IF NOT EXISTS v_route_delay_stats AS
+        SELECT
+            route,
+            origin,
+            dest,
+            COUNT(*) AS n_flights,
+            AVG(arr_delay) AS avg_arr_delay,
+            AVG(dep_delay) AS avg_dep_delay,
+            SUM(arr_del15) * 1.0 / COUNT(*) AS pct_arr_del15
+        FROM flights
+        WHERE cancelled = 0
+        GROUP BY route, origin, dest;
+        """,
+
+        "v_airport_delay_stats": """
+        CREATE VIEW IF NOT EXISTS v_airport_delay_stats AS
+        SELECT
+            origin AS airport,
+            COUNT(*) AS n_departures,
+            AVG(dep_delay) AS avg_dep_delay,
+            SUM(arr_del15) * 1.0 / COUNT(*) AS pct_arr_del15,
+            SUM(cancelled) * 1.0 / (COUNT(*) + SUM(cancelled)) AS cancellation_rate
+        FROM flights
+        GROUP BY origin;
+        """
+
     }
 
-    for name, sql in views.items():
+    for name, sql in tqdm(views.items(), desc="Creating views", unit="view"):
         run_execute(sql, db_file=DB_FILE)
         logging.info(f"Created view: {name}")
 
